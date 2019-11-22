@@ -1,0 +1,43 @@
+<html>
+<body>
+<canvas id="pad" width="400px" height="400px" style="border: black 1px solid"></canvas>
+<label>
+    number:<input id="num" type="text">
+</label>
+<button id="save">save</button>
+<script>
+    var saveFile = function(data, filename){
+        var save_link = document.createElementNS('http://www.w3.org/1999/xhtml', 'a');
+        save_link.href = data;
+        save_link.download = filename;
+
+        var event = document.createEvent('MouseEvents');
+        event.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+        save_link.dispatchEvent(event);
+    };
+
+    var oC = document.getElementById("pad");
+    var oCG = oC.getContext('2d');
+    oCG.fillStyle="#FFFFFF";
+    oCG.fillRect(0,0,399,399);
+    oC.onmousedown = function(ev) {
+        var ev = ev || window.event;
+        oCG.moveTo(ev.clientX - oC.offsetLeft, ev.clientY - oC.offsetTop);
+        document.onmousemove = function (ev) {
+            var ev = ev || window.event;
+            oCG.lineTo(ev.clientX - oC.offsetLeft, ev.clientY - oC.offsetTop);
+            oCG.stroke();
+        };
+        oC.onmouseup = function () {
+            document.onmousemove = null;
+            document.onmouseup = null;
+        };
+    };
+
+    document.getElementById('save').addEventListener('click', function () {
+       saveFile(oC.toDataURL("image/png"), (new Date()).getTime() + "_" +
+           document.getElementById("num").value + ".png");
+    })
+</script>
+</body>
+</html>

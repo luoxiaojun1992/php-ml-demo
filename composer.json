@@ -1,0 +1,16 @@
+{
+    "name": "luoxiaojun/php-ml-demo",
+    "type": "project",
+    "require": {
+        "php-ai/php-ml": "dev-master",
+      "ext-gd": "*",
+      "ext-imagick": "*"
+    },
+    "authors": [
+        {
+            "name": "luoxiaojun",
+            "email": "luoxiaojun@dodoca.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}
