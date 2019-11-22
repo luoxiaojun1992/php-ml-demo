@@ -49,7 +49,11 @@ $predicted = $classifier->predict($testSamples);
 echo 'Score: ' . ((string)(\Phpml\Metric\Accuracy::score($testTargets, $predicted))), PHP_EOL;
 
 echo 'Saving model...', PHP_EOL;
-(new \Phpml\ModelManager())->saveToFile($classifier, __DIR__ . '/models/mnist.model');
+$modelsDir = __DIR__ . '/models/';
+if (!is_dir($modelsDir)) {
+    mkdir($modelsDir, 0777, true);
+}
+(new \Phpml\ModelManager())->saveToFile($classifier, $modelsDir . 'mnist.model');
 
 $usage = microtime(true) - $start;
 echo 'Usage: ' . ((string)$usage) . 's', PHP_EOL;

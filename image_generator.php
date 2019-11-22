@@ -6,7 +6,11 @@ function process($imagePath, $label, $degree)
 {
     $image = imagecreatefrompng($imagePath);
     $rotatedImage = imagerotate($image, $degree, imagecolorallocate($image,255,255,255));
-    $newImagePath = __DIR__ . '/samples/train/' . ((string)intval(microtime(true) * 1000)) .
+    $trainDir = __DIR__ . '/samples/train/';
+    if (!is_dir($trainDir)) {
+        mkdir($trainDir, 0777, true);
+    }
+    $newImagePath = $trainDir . ((string)intval(microtime(true) * 1000)) .
         '_' . $label . '.png';
     imagepng(
         $rotatedImage,
@@ -23,9 +27,6 @@ while ($file = readdir($dir)) {
         $imageNameParts = explode('_', $fileNameParts[0]);
         $label = $imageNameParts[1];
         for ($i = -45; $i <= 45; ++$i) {
-            if ($i === 0) {
-                continue;
-            }
             process(__DIR__ . '/samples/origin_train/' . $file, $label, $i);
         }
     }

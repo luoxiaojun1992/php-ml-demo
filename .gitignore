@@ -1,6 +1,7 @@
 /data
 /models
-/samples
+/samples/processed
+/samples/train
 /vendor
 /.idea
 .DS_Store

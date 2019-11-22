@@ -27,7 +27,22 @@ function process($imagePath, $processedImagePath)
     return $samples[0];
 }
 
-$csv = fopen(__DIR__ . '/data/train.csv', 'wb');
+$dataDir = __DIR__ . '/data';
+if (!is_dir($dataDir)) {
+    mkdir($dataDir, 0777, true);
+}
+
+$processedTrainDir = __DIR__ . '/samples/processed/train/';
+if (!is_dir($processedTrainDir)) {
+    mkdir($processedTrainDir, 0777, true);
+}
+
+$processedTestDir = __DIR__ . '/samples/processed/test/';
+if (!is_dir($processedTestDir)) {
+    mkdir($processedTestDir, 0777, true);
+}
+
+$csv = fopen($dataDir . '/train.csv', 'wb');
 
 $dir = opendir(__DIR__ . '/samples/train');
 while ($file = readdir($dir)) {
@@ -38,7 +53,7 @@ while ($file = readdir($dir)) {
 
         $samples = process(
             __DIR__ . '/samples/train/' . $file,
-            __DIR__ . '/samples/processed/train/' . $file
+            $processedTrainDir . $file
         );
         $samples[] = $label;
 
@@ -60,7 +75,7 @@ while ($file = readdir($dir)) {
 
         $samples = process(
             __DIR__ . '/samples/test/' . $file,
-            __DIR__ . '/samples/processed/test/' . $file
+            $processedTestDir . $file
         );
         $samples[] = $label;
 
