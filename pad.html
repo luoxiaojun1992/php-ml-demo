@@ -5,7 +5,7 @@
     number:<input id="num" type="text">
 </label>
 <button id="save">save</button>
-<button id="predit">recognize</button>
+<button id="predict">recognize</button>
 <script>
     var saveFile = function(data, filename){
         var save_link = document.createElementNS('http://www.w3.org/1999/xhtml', 'a');
@@ -38,7 +38,27 @@
     document.getElementById('save').addEventListener('click', function () {
        saveFile(oC.toDataURL("image/png"), (new Date()).getTime() + "_" +
            document.getElementById("num").value + ".png");
-    })
+    });
+    document.getElementById('predict').addEventListener('click', function () {
+        oC.toBlob(function (blob) {
+            const myRequest = new Request('http://127.0.0.1:8080/server.php', {method: 'POST', body: blob});
+            fetch(myRequest).then(function (response) {
+                if (response.status === 200) {
+                    response.json().then(data => {
+                        if (data.code === 0) {
+                            const number = data.data.number;
+                            document.getElementById('num').value = number;
+                            alert('识别到数字: ' + number);
+                        } else {
+                            alert('API Error: ' + data.msg);
+                        }
+                    })
+                } else {
+                    alert('HTTP Error: ' + response.statusText);
+                }
+            });
+        }, 'image/png');
+    });
 </script>
 </body>
 </html>
