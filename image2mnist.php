@@ -8,14 +8,21 @@ function process($imagePath, $processedImagePath)
     $imagick->scaleImage(28, 28);
 
     $pixels = [];
-    for ($i = 0; $i < 28; ++$i) {
-        for ($j = 0; $j < 28; ++$j) {
-            $pixelColor = $imagick->getImagePixelColor($i, $j);
-            $blueValue = $pixelColor->getColorValue(Imagick::COLOR_BLUE);
-            $greenValue = $pixelColor->getColorValue(Imagick::COLOR_GREEN);
-            $redValue = $pixelColor->getColorValue(Imagick::COLOR_RED);
+    $pixelsIterator = $imagick->getPixelIterator();
+    foreach ($pixelsIterator as $row => $pixelList) {
+        foreach ($pixelList as $col => $pixel) {
+            $blueValue = $pixel->getColorValue(Imagick::COLOR_BLUE);
+            $greenValue = $pixel->getColorValue(Imagick::COLOR_GREEN);
+            $redValue = $pixel->getColorValue(Imagick::COLOR_RED);
+            if ($blueValue >= 0.99 && $greenValue >= 0.99 && $redValue >= 0.99) {
+                $pixel->setColorValue(Imagick::COLOR_BLUE, 0);
+                $pixel->setColorValue(Imagick::COLOR_GREEN, 0);
+                $pixel->setColorValue(Imagick::COLOR_RED, 0);
+                $blueValue = $greenValue = $redValue = 0;
+            }
             $pixels[] = $blueValue + $greenValue + $redValue;
         }
+        $pixelsIterator->syncIterator();
     }
 
     $imagick->writeImage($processedImagePath);
@@ -46,7 +53,7 @@ $csv = fopen($dataDir . '/train.csv', 'wb');
 
 $dir = opendir(__DIR__ . '/samples/train');
 while ($file = readdir($dir)) {
-    if (!in_array($file, ['.', '..'])) {
+    if ((!in_array($file, ['.', '..'])) && (!(strpos($file, '.') === 0))) {
         $fileNameParts = explode('.', $file);
         $imageNameParts = explode('_', $fileNameParts[0]);
         $label = $imageNameParts[1];
@@ -68,7 +75,7 @@ $csv = fopen(__DIR__ . '/data/test.csv', 'wb');
 
 $dir = opendir(__DIR__ . '/samples/test');
 while ($file = readdir($dir)) {
-    if (!in_array($file, ['.', '..'])) {
+    if ((!in_array($file, ['.', '..'])) && (!(strpos($file, '.') === 0))) {
         $fileNameParts = explode('.', $file);
         $imageNameParts = explode('_', $fileNameParts[0]);
         $label = $imageNameParts[1];

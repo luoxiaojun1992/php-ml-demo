@@ -6,15 +6,19 @@ function process($imageBlob)
 {
     $imagick = new Imagick();
     $imagick->readImageBlob($imageBlob);
+    $imagick->cropImage(399, 399, 0, 0);
     $imagick->scaleImage(28, 28);
 
     $pixels = [];
-    for ($i = 0; $i < 28; ++$i) {
-        for ($j = 0; $j < 28; ++$j) {
-            $pixelColor = $imagick->getImagePixelColor($i, $j);
-            $blueValue = $pixelColor->getColorValue(Imagick::COLOR_BLUE);
-            $greenValue = $pixelColor->getColorValue(Imagick::COLOR_GREEN);
-            $redValue = $pixelColor->getColorValue(Imagick::COLOR_RED);
+    $pixelsIterator = $imagick->getPixelIterator();
+    foreach ($pixelsIterator as $row => $pixelList) {
+        foreach ($pixelList as $col => $pixel) {
+            $blueValue = $pixel->getColorValue(Imagick::COLOR_BLUE);
+            $greenValue = $pixel->getColorValue(Imagick::COLOR_GREEN);
+            $redValue = $pixel->getColorValue(Imagick::COLOR_RED);
+            if ($blueValue >= 0.99 && $greenValue >= 0.99 && $redValue >= 0.99) {
+                $blueValue = $greenValue = $redValue = 0;
+            }
             $pixels[] = $blueValue + $greenValue + $redValue;
         }
     }
