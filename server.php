@@ -30,21 +30,42 @@ function process($imageBlob)
     return $samples[0];
 }
 
-try {
-    $imagePath = file_get_contents('php://input');
-    $model = (new \Phpml\ModelManager())->restoreFromFile(__DIR__ . '/models/mnist.model');
+$model = (new \Phpml\ModelManager())->restoreFromFile(__DIR__ . '/models/mnist.model');
 
-    echo json_encode([
-        'code' => 0,
-        'msg' => 'ok',
-        'data' => [
-            'number' => $model->predict(process($imagePath)),
-        ]
-    ]);
-} catch (\Throwable $e) {
-    echo json_encode([
-        'code' => 0,
-        'msg' => $e->getMessage() . ' | ' . $e->getTraceAsString(),
-        'data' => [],
-    ]);
-}
+$swHttpServer = new \Swoole\Http\Server(
+    '0.0.0.0',
+    8080
+);
+
+$swHttpServer->on('start', function ($server) {
+    echo 'Server started...', PHP_EOL;
+});
+
+$swHttpServer->on('request', function($request, $response) use ($model) {
+    try {
+        $imagePath = $request->rawContent();
+
+        $response->end(json_encode([
+            'code' => 0,
+            'msg' => 'ok',
+            'data' => [
+                'number' => $model->predict(process($imagePath)),
+            ]
+        ]));
+    } catch (\Throwable $e) {
+        $response->end(json_encode([
+            'code' => 0,
+            'msg' => $e->getMessage() . ' | ' . $e->getTraceAsString(),
+            'data' => [],
+        ]));
+    }
+});
+
+$swHttpServer->set([
+    'enable_coroutine' => false,
+    'worker_num' => 1,
+    'document_root' => __DIR__,
+    'enable_static_handler' => true,
+]);
+
+$swHttpServer->start();

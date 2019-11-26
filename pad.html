@@ -1,4 +1,7 @@
 <html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+</head>
 <body>
 <canvas id="pad" width="400px" height="400px" style="border: black 1px solid"></canvas>
 <label>
@@ -41,7 +44,7 @@
     });
     document.getElementById('predict').addEventListener('click', function () {
         oC.toBlob(function (blob) {
-            const myRequest = new Request('http://127.0.0.1:8080/server.php', {method: 'POST', body: blob});
+            const myRequest = new Request('http://127.0.0.1:8080', {method: 'POST', body: blob});
             fetch(myRequest).then(function (response) {
                 if (response.status === 200) {
                     response.json().then(data => {
