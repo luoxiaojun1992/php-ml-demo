@@ -2,6 +2,7 @@
 /models
 /samples/processed
 /samples/train
+/samples/test
 /vendor
 /.idea
 .DS_Store
